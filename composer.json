@@ -1,0 +1,30 @@
+{
+    "name": "uvdesk/package-resolver",
+    "type": "composer-plugin",
+    "description": "Composer plugin for UVDesk Packages",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Akshay Kumar",
+            "email": "akshay.kumar758@webkul.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "symfony/yaml": "^3.4",
+        "composer/composer": "^1.0.2",
+        "composer-plugin-api": "^1.0"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "^3.2.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkul\\UVDesk\\PackageResolver\\": ""
+        }
+    },
+    "extra": {
+        "class": "Webkul\\UVDesk\\PackageResolver\\Composer\\Plugin"
+    },
+    "minimum-stability": "dev"
+}
