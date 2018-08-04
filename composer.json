@@ -1,7 +1,7 @@
 {
-    "name": "uvdesk/package-resolver",
+    "name": "uvdesk/init",
     "type": "composer-plugin",
-    "description": "Composer plugin for UVDesk Packages",
+    "description": "Composer plugin for UVDesk Project",
     "license": "MIT",
     "authors": [
         {
@@ -11,20 +11,19 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/yaml": "^3.4",
-        "composer/composer": "^1.0.2",
         "composer-plugin-api": "^1.0"
     },
     "require-dev": {
+        "composer/composer": "^1.0.2",
         "symfony/phpunit-bridge": "^3.2.8"
     },
     "autoload": {
         "psr-4": {
-            "Webkul\\UVDesk\\PackageResolver\\": ""
+            "Webkul\\UVDesk\\Init\\": ""
         }
     },
     "extra": {
-        "class": "Webkul\\UVDesk\\PackageResolver\\Composer\\Plugin"
+        "class": "Webkul\\UVDesk\\Init\\Composer\\Plugin"
     },
     "minimum-stability": "dev"
 }

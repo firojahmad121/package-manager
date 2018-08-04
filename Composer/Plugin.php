@@ -1,6 +1,6 @@
 <?php
 
-namespace Webkul\UVDesk\PackageResolver\Composer;
+namespace Webkul\UVDesk\Init\Composer;
 
 use Composer\Composer;
 use Composer\Script\Event;
@@ -68,15 +68,20 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     public function postPackagesUpdateEvent(Event $event)
     {
         $packageCollection = $this->loadDependencies($this->packagesOperation);
+        $count = count($packageCollection);
 
-        $this->io->writeError("\n<info>UVDesk dependencies operations</info>");
+        if ($count) {
+            $this->io->writeError("\n<info>Community operations: $count configurations</info>");
 
-        // foreach ($packageCollection as $package) {
-        //    $this->io->writeError(sprintf('%s package %s [$s].', $package['operation'], $package['name'], $package['version'])); 
-        // }
-        // if (!file_exists(getcwd().'/.env') && file_exists(getcwd().'/.env.dist')) {
-        //     copy(getcwd().'/.env.dist', getcwd().'/.env');
-        // }
+            foreach ($packageCollection as $package) {
+               $this->io->writeError(sprintf('%s package %s.', $package['type'], $package['name'])); 
+            }
+
+            // if (!file_exists(getcwd().'/.env') && file_exists(getcwd().'/.env.dist')) {
+            //     copy(getcwd().'/.env.dist', getcwd().'/.env');
+            // }
+        }
+
 
         // $this->io->writeError('');
         // $this->io->writeError('What about running <comment>composer global require symfony/thanks && composer thanks</> now?');
@@ -97,15 +102,14 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             $package = $packageOperation instanceof UpdateOperation ? $packageOperation->getTargetPackage() : $packageOperation->getPackage();
             $eventType = $packageOperation instanceof UpdateOperation ? 'update' : ($packageOperation instanceof UninstallOperation ? 'remove' : 'install');
 
-            $name = $package->getNames()[0];
-            $this->io->writeError("Evaludating dependencies for $name [" . (int) in_array($name, self::$evalPackages) . "]\n");
-            // self::getPackageVersion($package);
-
-            // $packagesCollection[] = [
-            //     'name' => $name,
-            //     'operation' => $operationType,
-            //     'version' => $version,
-            // ];
+            if (in_array($package->getNames()[0], self::$evalPackages)) {
+                $packagesCollection[] = [
+                    'name' => $package->getNames()[0],
+                    'package' => $package,
+                    'operation' => $packageOperation,
+                    'type' => $eventType,
+                ];
+            }
         }
 
         return $packagesCollection;
