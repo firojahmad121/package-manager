@@ -17,6 +17,12 @@
         "composer/composer": "^1.0.2",
         "symfony/phpunit-bridge": "^3.2.8"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/akshaywebkul/init"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Webkul\\UVDesk\\Init\\": ""
