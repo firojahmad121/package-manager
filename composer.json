@@ -28,7 +28,7 @@
         }
     },
     "extra": {
-        "class": "Webkul\\UVDesk\\Init\\Composer\\Plugin"
+        "class": "Webkul\\UVDesk\\Init\\Plugin"
     },
     "minimum-stability": "dev"
 }

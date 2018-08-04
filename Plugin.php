@@ -1,6 +1,6 @@
 <?php
 
-namespace Webkul\UVDesk\Init\Composer;
+namespace Webkul\UVDesk\Init;
 
 use Composer\Composer;
 use Composer\Script\Event;
