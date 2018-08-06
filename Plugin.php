@@ -85,7 +85,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             // Get the bundle namespace 
             $bundleNameIterator = explode("\\", $bundleName);
             array_pop($bundleNameIterator);
-            $namespace = implode("\\", $namespace);
+            $namespace = implode("\\", $bundleNameIterator);
 
             $composerListenerClassPath = "\\$namespace\\" . self::$defaultListenerClass;
 
