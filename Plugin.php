@@ -84,7 +84,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     public function postProjectCreationEvent(Event $event)
     {
         print("\nProject Created\n");
-        VarDumper::dump(getcwd());
+        $registeredBundles = require getcwd() . "/config/bundles.php";
+        VarDumper::dump($registeredBundles);
         // $dispatcher = new EventDispatcher();
 
         // $contents = require $this->getProjectDir() . '/config/bundles.php';
