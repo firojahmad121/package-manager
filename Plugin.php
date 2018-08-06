@@ -101,24 +101,12 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             foreach ($composerHandlers as $composerHandlerClass) {
                 if (method_exists($composerHandlerClass, 'onProjectCreated')) {
                     VarDumper::dump('Adding ' . $composerHandlerClass);
-                    $dispatcher->addListener('composer.event_listener', [new $composerHandlerClass(), 'onProjectCreated']);
+                    $dispatcher->addListener('composer.projectCreated', [new $composerHandlerClass(), 'onProjectCreated']);
                 }
             }
         }
-        
 
-        // $contents = require $this->getProjectDir() . '/config/bundles.php';
-        // foreach ($contents as $class => $envs) {
-        //     if (isset($envs['all']) || isset($envs[$this->environment])) {
-        //         yield new $class();
-        //     }
-        // }
-
-        // Webkul\UVDesk\CommunityFrameworkBundle\EventListener\ComposerEventListener:
-        // tags:
-        //     - { name: composer.event_listener, event: composer.projectCreated }
-
-        // $dispatcher->dispatch('composer.projectCreated');
+        $dispatcher->dispatch('composer.projectCreated');
         die;
     }
 
