@@ -23,11 +23,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     private $composer;
     private $packagesOperation = [];
     private static $activated = true;
-    private static $evalPackages = [
-        'uvdesk/community',
-        'uvdesk/community-framework-bundle',
-        'uvdesk/support-bundle',
-    ];
+    private static $defaultListenerClass = "EventListener\\ComposerEventListener";
 
     public function activate(Composer $composer, IOInterface $io)
     {
@@ -83,18 +79,20 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
     public function postProjectCreationEvent(Event $event)
     {
-        print("\nProject Created\n");
+        $registeredBundles = require getcwd() . "/config/bundles.php";
 
-        $registeredBundles = array_keys(require getcwd() . "/config/bundles.php");
-        VarDumper::dump($registeredBundles);
+        foreach ($registeredBundles as $bundleName => $options) {
+            // Get the bundle namespace 
+            $bundleNameIterator = explode("\\", $bundleName);
+            array_pop($bundleNameIterator);
+            $namespace = implode("\\", $namespace);
 
-        foreach ($registeredBundles as $bundleName) {
-            $composerListenerClassPath = "\\$bundleName\\EventListener\\ComposerEventListener";
+            $composerListenerClassPath = "\\$namespace\\" . self::$defaultListenerClass;
 
             if (class_exists($composerListenerClassPath)) {
-                VarDumper::dump($bundleName . ' => Yes');
+                VarDumper::dump($composerListenerClassPath . ' => Yes');
             } else {
-                VarDumper::dump($bundleName . ' => No');
+                VarDumper::dump($composerListenerClassPath . ' => No');
             }
         }
         
