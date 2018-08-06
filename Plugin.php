@@ -84,9 +84,21 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     public function postProjectCreationEvent(Event $event)
     {
         print("\nProject Created\n");
-        $dispatcher = new EventDispatcher();
-        VarDumper::dump($dispatcher);
-        $dispatcher->dispatch('composer.projectCreated');
+        VarDumper::dump(getcwd());
+        // $dispatcher = new EventDispatcher();
+
+        // $contents = require $this->getProjectDir() . '/config/bundles.php';
+        // foreach ($contents as $class => $envs) {
+        //     if (isset($envs['all']) || isset($envs[$this->environment])) {
+        //         yield new $class();
+        //     }
+        // }
+
+        // Webkul\UVDesk\CommunityFrameworkBundle\EventListener\ComposerEventListener:
+        // tags:
+        //     - { name: composer.event_listener, event: composer.projectCreated }
+
+        // $dispatcher->dispatch('composer.projectCreated');
         die;
     }
 
