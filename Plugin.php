@@ -14,6 +14,8 @@ use Composer\DependencyResolver\Operation\OperationInterface;
 use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\Package\PackageInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\VarDumper\VarDumper;
 
 class Plugin implements PluginInterface, EventSubscriberInterface
 {
@@ -71,32 +73,27 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $count = count($packageCollection);
 
         if ($count) {
-            $this->io->writeError("\n<info>Community operations: $count configurations</info>");
+            $this->io->writeError("\n<info>Community operations: Updating $count configurations</info>");
 
             foreach ($packageCollection as $package) {
                $this->io->writeError(sprintf('%s package %s.', $package['type'], $package['name'])); 
             }
-
-            // if (!file_exists(getcwd().'/.env') && file_exists(getcwd().'/.env.dist')) {
-            //     copy(getcwd().'/.env.dist', getcwd().'/.env');
-            // }
         }
-
-
-        // $this->io->writeError('');
-        // $this->io->writeError('What about running <comment>composer global require symfony/thanks && composer thanks</> now?');
-        // $this->io->writeError(sprintf('This will spread some %s by sending a %s to the GitHub repositories of your fellow package maintainers.', $love, $star));
-        // $this->io->writeError('');
     }
 
     public function postProjectCreationEvent(Event $event)
     {
         print("\nProject Created\n");
+        $dispatcher = new EventDispatcher();
+        VarDumper::dump($dispatcher);
+        $dispatcher->dispatch('composer.projectCreated');
+        die;
     }
 
     public function loadDependencies(array $packageOperations = [])
     {
         $packagesCollection = [];
+        return $packagesCollection;
 
         foreach ($packageOperations as $packageOperation) {
             $package = $packageOperation instanceof UpdateOperation ? $packageOperation->getTargetPackage() : $packageOperation->getPackage();
