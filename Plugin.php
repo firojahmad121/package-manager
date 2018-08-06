@@ -58,6 +58,20 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         return $version;
     }
 
+    private static function getPackagesComposerHandler(array $bundleCollection = [])
+    {
+        $handlers = [];
+        foreach (array_keys($bundleCollection) as $bundle) {
+            $namespaceIteration = explode("\\", $bundle);
+            array_pop($namespaceIteration); // Pop the last element as it will be the same as it will be the name of the Bundle Class.
+
+            $eventListener = "\\" . implode("\\", $bundleNameIterator) . "\\" . self::$defaultListenerClass;
+            if (class_exists($eventListener)) $handlers[] = $eventListener;
+        }
+
+        return $handlers;
+    }
+
     public function postPackagesInstallEvent(Event $event)
     {
         $this->postPackagesUpdateEvent($event);
@@ -79,24 +93,20 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
     public function postProjectCreationEvent(Event $event)
     {
-        $registeredBundles = require getcwd() . "/config/bundles.php";
+        $composerHandlers = self::getPackagesComposerHandler(require getcwd() . "/config/bundles.php");
+        VarDumper::dump($composerHandlers);
 
-        foreach ($registeredBundles as $bundleName => $options) {
-            // Get the bundle namespace 
-            $bundleNameIterator = explode("\\", $bundleName);
-            array_pop($bundleNameIterator);
-            $namespace = implode("\\", $bundleNameIterator);
+        if (!empty($composerHandlers)) {
+            $dispatcher = new EventDispatcher();
 
-            $composerListenerClassPath = "\\$namespace\\" . self::$defaultListenerClass;
-
-            if (class_exists($composerListenerClassPath)) {
-                VarDumper::dump($composerListenerClassPath . ' => Yes');
-            } else {
-                VarDumper::dump($composerListenerClassPath . ' => No');
+            foreach ($composerHandlers as $composerHandlerClass) {
+                if (method_exists($composerHandlerClass, 'onProjectCreated')) {
+                    VarDumper::dump('Adding ' . $composerHandlerClass);
+                    $dispatcher->addListener('composer.event_listener', [new $composerHandlerClass(), 'onProjectCreated']);
+                }
             }
         }
         
-        // $dispatcher = new EventDispatcher();
 
         // $contents = require $this->getProjectDir() . '/config/bundles.php';
         // foreach ($contents as $class => $envs) {
