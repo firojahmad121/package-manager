@@ -22,7 +22,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     private $io;
     private $composer;
     private $packagesOperation = [];
-    private static $activated = true;
     private static $defaultListenerClass = "EventListener\\ComposerEventListener";
 
     public function activate(Composer $composer, IOInterface $io)
@@ -65,7 +64,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             $namespaceIteration = explode("\\", $bundle);
             array_pop($namespaceIteration); // Pop the last element as it will be the same as it will be the name of the Bundle Class.
 
-            $eventListener = "\\" . implode("\\", $bundleNameIterator) . "\\" . self::$defaultListenerClass;
+            $eventListener = "\\" . implode("\\", $namespaceIteration) . "\\" . self::$defaultListenerClass;
             if (class_exists($eventListener)) $handlers[] = $eventListener;
         }
 
@@ -147,10 +146,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     
     public static function getSubscribedEvents()
     {
-        if (!self::$activated) {
-            return [];
-        }
-
         return [
             PackageEvents::POST_PACKAGE_INSTALL => 'logPackageEvent',
             PackageEvents::POST_PACKAGE_UPDATE => 'logPackageEvent',
