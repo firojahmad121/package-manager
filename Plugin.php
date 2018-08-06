@@ -93,21 +93,18 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     public function postProjectCreationEvent(Event $event)
     {
         $composerHandlers = self::getPackagesComposerHandler(require getcwd() . "/config/bundles.php");
-        VarDumper::dump($composerHandlers);
 
         if (!empty($composerHandlers)) {
             $dispatcher = new EventDispatcher();
-
-            foreach ($composerHandlers as $composerHandlerClass) {
-                if (method_exists($composerHandlerClass, 'onProjectCreated')) {
-                    VarDumper::dump('Adding ' . $composerHandlerClass);
-                    $dispatcher->addListener('composer.projectCreated', [new $composerHandlerClass(), 'onProjectCreated']);
+            
+            foreach ($composerHandlers as $handler) {
+                if (method_exists($handler, 'onProjectCreated')) {
+                    $dispatcher->addListener('composer.projectCreated', [new $handler(), 'onProjectCreated']);
                 }
             }
-        }
 
-        $dispatcher->dispatch('composer.projectCreated');
-        die;
+            $dispatcher->dispatch('composer.projectCreated');
+        }
     }
 
     public function loadDependencies(array $packageOperations = [])
