@@ -16,12 +16,6 @@
     "require-dev": {
         "composer/composer": "^1.7@dev"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/akshaywebkul/init"
-        }
-    ],
     "autoload": {
         "psr-4": {
             "Webkul\\UVDesk\\Init\\": ""
