@@ -1,5 +1,5 @@
 {
-    "name": "uvdesk/init",
+    "name": "uvdesk/package-manager",
     "type": "composer-plugin",
     "description": "Composer plugin for UVDesk Project",
     "license": "MIT",
@@ -18,11 +18,11 @@
     },
     "autoload": {
         "psr-4": {
-            "Webkul\\UVDesk\\Init\\": ""
+            "Webkul\\UVDesk\\PackageManager\\": "lib/"
         }
     },
     "extra": {
-        "class": "Webkul\\UVDesk\\Init\\Plugin"
+        "class": "Webkul\\UVDesk\\PackageManager\\Manager"
     },
     "minimum-stability": "dev"
 }

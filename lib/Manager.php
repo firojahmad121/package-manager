@@ -1,6 +1,6 @@
 <?php
 
-namespace Webkul\UVDesk\Init;
+namespace Webkul\UVDesk\PackageManager;
 
 use Composer\Composer;
 use Composer\Script\Event;
@@ -15,9 +15,8 @@ use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\Package\PackageInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\VarDumper\VarDumper;
 
-class Plugin implements PluginInterface, EventSubscriberInterface
+class Manager implements PluginInterface, EventSubscriberInterface
 {
     private $io;
     private $composer;
@@ -116,14 +115,14 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             $package = $packageOperation instanceof UpdateOperation ? $packageOperation->getTargetPackage() : $packageOperation->getPackage();
             $eventType = $packageOperation instanceof UpdateOperation ? 'update' : ($packageOperation instanceof UninstallOperation ? 'remove' : 'install');
 
-            if (in_array($package->getNames()[0], self::$evalPackages)) {
+            // if (in_array($package->getNames()[0], self::$evalPackages)) {
                 $packagesCollection[] = [
                     'name' => $package->getNames()[0],
                     'package' => $package,
                     'operation' => $packageOperation,
                     'type' => $eventType,
                 ];
-            }
+            // }
         }
 
         return $packagesCollection;
