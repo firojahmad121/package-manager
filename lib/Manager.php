@@ -15,6 +15,7 @@ use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\Package\PackageInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Webkul\UVDesk\PackageManager\Installer\AbstractInstaller;
 
 class Manager implements PluginInterface, EventSubscriberInterface
 {
@@ -56,18 +57,60 @@ class Manager implements PluginInterface, EventSubscriberInterface
         return $version;
     }
 
-    private static function getPackagesComposerHandler(array $bundleCollection = [])
+    private static function getComposerPackageInstaller(array $bundleCollection = [])
     {
-        $handlers = [];
-        foreach (array_keys($bundleCollection) as $bundle) {
-            $namespaceIteration = explode("\\", $bundle);
-            array_pop($namespaceIteration); // Pop the last element as it will be the same as it will be the name of the Bundle Class.
+        $extras = $package->getExtra();
+        if (!empty($extras['uvdesk-installer']) && class_exists($extras['uvdesk-installer'])) {
+            $installer = new $extras['uvdesk-installer']();
 
-            $eventListener = "\\" . implode("\\", $namespaceIteration) . "\\" . self::$defaultListenerClass;
-            if (class_exists($eventListener)) $handlers[] = $eventListener;
+            if ($installer instanceof AbstractInstaller) {
+                echo $extras['uvdesk-installer'] . "\n";
+                return $installer;
+            } else {
+                echo $extras['uvdesk-installer'] . " not valid \n";
+            }
+        } else {
+            echo $extras['uvdesk-installer'] . " not found \n";
         }
 
+        // $handlers = [];
+        // foreach (array_keys($bundleCollection) as $bundle) {
+        //     $namespaceIteration = explode("\\", $bundle);
+        //     array_pop($namespaceIteration); // Pop the last element as it will be the same as it will be the name of the Bundle Class.
+
+        //     $eventListener = "\\" . implode("\\", $namespaceIteration) . "\\" . self::$defaultListenerClass;
+        //     if (class_exists($eventListener)) $handlers[] = $eventListener;
+        // }
+
         return $handlers;
+    }
+
+    public function loadDependencies(array $packageOperations = [])
+    {
+        $packagesCollection = [];
+
+        foreach ($packageOperations as $packageOperation) {
+            $package = $packageOperation instanceof UpdateOperation ? $packageOperation->getTargetPackage() : $packageOperation->getPackage();
+            $eventType = $packageOperation instanceof UpdateOperation ? 'update' : ($packageOperation instanceof UninstallOperation ? 'remove' : 'install');
+            
+            $packageInstaller = self::getComposerPackageInstaller($package);
+            if (!empty($packageInstaller)) {
+                $packagesCollection[] = $packageInstaller;
+            }
+
+            // $extras = $package->getExtra();
+            // if (!empty($extras['uvdesk-installer'])) {
+
+            //     $packagesCollection[] = [
+            //         'name' => $package->getNames()[0],
+            //         'package' => $package,
+            //         'operation' => $packageOperation,
+            //         'type' => $eventType,
+            //     ];
+            // }
+        }
+
+        return $packagesCollection;
     }
 
     public function postPackagesInstallEvent(Event $event)
@@ -91,41 +134,19 @@ class Manager implements PluginInterface, EventSubscriberInterface
 
     public function postProjectCreationEvent(Event $event)
     {
-        $composerHandlers = self::getPackagesComposerHandler(require getcwd() . "/config/bundles.php");
+        // $composerHandlers = self::getPackagesComposerHandler(require getcwd() . "/config/bundles.php");
 
-        if (!empty($composerHandlers)) {
-            $dispatcher = new EventDispatcher();
+        // if (!empty($composerHandlers)) {
+        //     $dispatcher = new EventDispatcher();
             
-            foreach ($composerHandlers as $handler) {
-                if (method_exists($handler, 'onProjectCreated')) {
-                    $dispatcher->addListener('composer.projectCreated', [new $handler(), 'onProjectCreated']);
-                }
-            }
+        //     foreach ($composerHandlers as $handler) {
+        //         if (method_exists($handler, 'onProjectCreated')) {
+        //             $dispatcher->addListener('composer.projectCreated', [new $handler(), 'onProjectCreated']);
+        //         }
+        //     }
 
-            $dispatcher->dispatch('composer.projectCreated');
-        }
-    }
-
-    public function loadDependencies(array $packageOperations = [])
-    {
-        $packagesCollection = [];
-        // return $packagesCollection;
-
-        foreach ($packageOperations as $packageOperation) {
-            $package = $packageOperation instanceof UpdateOperation ? $packageOperation->getTargetPackage() : $packageOperation->getPackage();
-            $eventType = $packageOperation instanceof UpdateOperation ? 'update' : ($packageOperation instanceof UninstallOperation ? 'remove' : 'install');
-
-            // if (in_array($package->getNames()[0], self::$evalPackages)) {
-                $packagesCollection[] = [
-                    'name' => $package->getNames()[0],
-                    'package' => $package,
-                    'operation' => $packageOperation,
-                    'type' => $eventType,
-                ];
-            // }
-        }
-
-        return $packagesCollection;
+        //     $dispatcher->dispatch('composer.projectCreated');
+        // }
     }
     
     public static function getSubscribedEvents()
