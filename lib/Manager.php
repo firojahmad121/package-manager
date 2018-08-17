@@ -12,10 +12,8 @@ use Composer\Installer\PackageEvents;
 use Composer\Package\PackageInterface;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Webkul\UVDesk\PackageManager\Composer\ComposerEvent;
 use Composer\DependencyResolver\Operation\UpdateOperation;
-use Composer\DependencyResolver\Operation\OperationInterface;
-use Composer\DependencyResolver\Operation\UninstallOperation;
+use Webkul\UVDesk\PackageManager\Composer\ComposerPackageListener;
 
 class Manager implements PluginInterface, EventSubscriberInterface
 {
@@ -58,32 +56,30 @@ class Manager implements PluginInterface, EventSubscriberInterface
 
     public function loadDependencies(array $packageOperations = [])
     {
-        $packagesCollection = [];
+        $dependencies = [
+            'count' => ['install' => 0, 'update' => 0, 'remove' => 0],
+            'listeners' => [],
+        ];
 
         foreach ($packageOperations as $packageOperation) {
             $package = $packageOperation instanceof UpdateOperation ? $packageOperation->getTargetPackage() : $packageOperation->getPackage();
             $extras = $package->getExtra();
             
-            if (!empty($extras['package-handle']) && class_exists($extras['package-handle'])) {
+            if (!empty($extras['uvdesk-handler']) && class_exists($extras['uvdesk-handler'])) {
                 try {
-                    $packageEventHandler = new $extras['package-handle']($package, $packageOperation);
+                    $packageListener = new $extras['uvdesk-handler']($package, $packageOperation);
                     
-                    if ($packageEventHandler instanceof ComposerEvent) {
-                        $packagesCollection[] = $packageEventHandler;
-                        // $packagesCollection[] = [
-                        //     'package' => $package,
-                        //     'installer' => $installer,
-                        //     'operation' => $packageOperation,
-                        //     // 'operationType' => $packageOperation instanceof UpdateOperation ? 'update' : ($packageOperation instanceof UninstallOperation ? 'remove' : 'install'),
-                        // ];
+                    if ($packageListener instanceof ComposerPackageListener) {
+                        $dependencies['listeners'][] = $packageListener;
+                        $dependencies['count'][$packageListener->getPackageOperationType()] += 1;
                     }
                 } catch (\Exception $e) {
-                    // Skip
+                    $this->io->writeError("\n<error>Failed to evaluate configs for package <error><comment>" . $package->getNames()[0] . "</comment>");
                 }
             }
         }
 
-        return $packagesCollection;
+        return $dependencies;
     }
 
     public function postPackagesInstallEvent(Event $event)
@@ -93,19 +89,18 @@ class Manager implements PluginInterface, EventSubscriberInterface
 
     public function postPackagesUpdateEvent(Event $event)
     {
-        $packageCollection = $this->loadDependencies($this->packagesOperation);
-        $count = count($packageCollection);
+        $this->io->writeError("\n<comment>Evaluating dependency configurations (uvdesk packages)</comment>");
+        $packages = $this->loadDependencies($this->packagesOperation);
 
-        if ($count) {
-            $this->io->writeError("\n<info>UVDesk operations: Updating $count configurations</info>");
+        if (!empty($packages['listeners'])) {
             $dispatcher = new EventDispatcher();
+            $this->io->writeError(sprintf("<info>Configuration operations: %s install, %s updates, %s removals</info>", $packages['count']['install'], $packages['count']['update'], $packages['count']['remove']));
 
-            foreach ($packageCollection as $package) {
-                $dispatcher->addListener('composer.packageUpdated', [$package['installer'], 'onPackageUpdated']);
-                $this->io->writeError(sprintf('updating package %s.', $package['name']));
+            foreach ($packageCollection as $packageEventHandler) {
+                $dispatcher->addListener('uvdesk.composer.packageUpdated', [$packageEventHandler, 'onPackageUpdated']);
             }
 
-            $dispatcher->dispatch('composer.projectCreated');
+            $dispatcher->dispatch('uvdesk.composer.packageUpdated');
         }
     }
 

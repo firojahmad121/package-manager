@@ -4,9 +4,11 @@ namespace Webkul\UVDesk\PackageManager\Composer;
 
 use Composer\Package\PackageInterface;
 use Symfony\Component\EventDispatcher\Event;
+use Composer\DependencyResolver\Operation\UpdateOperation;
+use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\DependencyResolver\Operation\OperationInterface;
 
-abstract class ComposerEvent
+abstract class ComposerPackageListener
 {
     private $package;
     private $operation;
@@ -22,9 +24,19 @@ abstract class ComposerEvent
         return $this->package;
     }
 
+    public final function getPackageName()
+    {
+        return $this->package->getNames()[0];
+    }
+    
     public final function getPackageOperation()
     {
         return $this->operation;
+    }
+
+    public final function getPackageOperationType()
+    {
+        return $this->operation instanceof UpdateOperation ? 'update' : ($this->operation instanceof UninstallOperation ? 'remove' : 'install');
     }
 
     abstract public static function onProjectCreated(Event $event);
