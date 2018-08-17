@@ -82,7 +82,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $count = count($packageCollection);
 
         if ($count) {
-            $this->io->writeError("\n<info>Community operations: Updating $count configurations</info>");
+            $this->io->writeError("\n<info>UVDesk operations: Updating $count configurations</info>");
 
             foreach ($packageCollection as $package) {
                $this->io->writeError(sprintf('%s package %s.', $package['type'], $package['name'])); 
@@ -110,7 +110,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     public function loadDependencies(array $packageOperations = [])
     {
         $packagesCollection = [];
-        return $packagesCollection;
+        // return $packagesCollection;
 
         foreach ($packageOperations as $packageOperation) {
             $package = $packageOperation instanceof UpdateOperation ? $packageOperation->getTargetPackage() : $packageOperation->getPackage();
