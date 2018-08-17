@@ -61,6 +61,8 @@ class Manager implements PluginInterface, EventSubscriberInterface
             'listeners' => [],
         ];
 
+        $this->io->writeError("\n<comment>Evaluating dependency configurations (uvdesk packages)</comment>");
+
         foreach ($packageOperations as $packageOperation) {
             $package = $packageOperation instanceof UpdateOperation ? $packageOperation->getTargetPackage() : $packageOperation->getPackage();
             $extras = $package->getExtra();
@@ -89,7 +91,6 @@ class Manager implements PluginInterface, EventSubscriberInterface
 
     public function postPackagesUpdateEvent(Event $event)
     {
-        $this->io->writeError("\n<comment>Evaluating dependency configurations (uvdesk packages)</comment>");
         $packages = $this->loadDependencies($this->packagesOperation);
 
         if (!empty($packages['listeners'])) {
@@ -106,19 +107,18 @@ class Manager implements PluginInterface, EventSubscriberInterface
 
     public function postProjectCreationEvent(Event $event)
     {
-        // $composerHandlers = self::getPackagesComposerHandler(require getcwd() . "/config/bundles.php");
+        $packages = $this->loadDependencies($this->packagesOperation);
 
-        // if (!empty($composerHandlers)) {
-        //     $dispatcher = new EventDispatcher();
-            
-        //     foreach ($composerHandlers as $handler) {
-        //         if (method_exists($handler, 'onProjectCreated')) {
-        //             $dispatcher->addListener('composer.projectCreated', [new $handler(), 'onProjectCreated']);
-        //         }
-        //     }
+        if (!empty($packages['listeners'])) {
+            $dispatcher = new EventDispatcher();
+            $this->io->writeError(sprintf("<info>Configuration operations: %s install, %s updates, %s removals</info>", $packages['count']['install'], $packages['count']['update'], $packages['count']['remove']));
 
-        //     $dispatcher->dispatch('composer.projectCreated');
-        // }
+            foreach ($packageCollection as $packageEventHandler) {
+                $dispatcher->addListener('uvdesk.composer.projectCreated', [$packageEventHandler, 'onProjectCreated']);
+            }
+
+            $dispatcher->dispatch('uvdesk.composer.projectCreated');
+        }
     }
     
     public static function getSubscribedEvents()
