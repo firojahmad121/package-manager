@@ -52,7 +52,7 @@ abstract class ComposerPackageListener
     public final function handleComposerPackageUpdate(Event $event)
     {
         $consoleOutput = new ConsoleOutput();
-        $consoleOutput->write(sprintf("  - Configuring <info>%s</info>", $this->getPackageName()));
+        $consoleOutput->write(sprintf("  - Configuring <info>%s</info>\n", $this->getPackageName()));
 
         $this->onPackageUpdated($event);
     }

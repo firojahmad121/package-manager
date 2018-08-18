@@ -96,6 +96,7 @@ class Manager implements PluginInterface, EventSubscriberInterface
             }
 
             $dispatcher->dispatch('uvdesk.composer.package.updated');
+            $this->io->writeError("");
         }
     }
 
