@@ -97,8 +97,8 @@ class Manager implements PluginInterface, EventSubscriberInterface
             $dispatcher = new EventDispatcher();
             $this->io->writeError(sprintf("<info>Configuration operations: %s install, %s updates, %s removals</info>", $packages['count']['install'], $packages['count']['update'], $packages['count']['remove']));
 
-            foreach ($packageCollection as $packageEventHandler) {
-                $dispatcher->addListener('uvdesk.composer.packageUpdated', [$packageEventHandler, 'onPackageUpdated']);
+            foreach ($packages['listeners'] as $packageHandler) {
+                $dispatcher->addListener('uvdesk.composer.packageUpdated', [$packageHandler, 'onPackageUpdated']);
             }
 
             $dispatcher->dispatch('uvdesk.composer.packageUpdated');
@@ -113,8 +113,8 @@ class Manager implements PluginInterface, EventSubscriberInterface
             $dispatcher = new EventDispatcher();
             $this->io->writeError(sprintf("<info>Configuration operations: %s install, %s updates, %s removals</info>", $packages['count']['install'], $packages['count']['update'], $packages['count']['remove']));
 
-            foreach ($packageCollection as $packageEventHandler) {
-                $dispatcher->addListener('uvdesk.composer.projectCreated', [$packageEventHandler, 'onProjectCreated']);
+            foreach ($packages['listeners'] as $packageHandler) {
+                $dispatcher->addListener('uvdesk.composer.projectCreated', [$packageHandler, 'onProjectCreated']);
             }
 
             $dispatcher->dispatch('uvdesk.composer.projectCreated');
