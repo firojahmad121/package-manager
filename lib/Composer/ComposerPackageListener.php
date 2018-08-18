@@ -13,7 +13,6 @@ abstract class ComposerPackageListener
 {
     private $package;
     private $operation;
-    private $consoleOutput;
 
     abstract public function onProjectCreated(Event $event);
     abstract public function onPackageUpdated(Event $event);
@@ -23,7 +22,6 @@ abstract class ComposerPackageListener
     {
         $this->package = $package;
         $this->operation = $operation;
-        $this->consoleOutput = new ConsoleOutput();
     }
 
     public final function getPackage()
@@ -53,7 +51,8 @@ abstract class ComposerPackageListener
 
     public final function handleComposerPackageUpdate(Event $event)
     {
-        $this->consoleOutput->write(sprintf("  - Configuring <info>%s</info>", $this->getPackageName()));
+        $consoleOutput = new ConsoleOutput();
+        $consoleOutput->write(sprintf("  - Configuring <info>%s</info>", $this->getPackageName()));
 
         $this->onPackageUpdated($event);
     }
