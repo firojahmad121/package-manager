@@ -89,13 +89,13 @@ class Manager implements PluginInterface, EventSubscriberInterface
 
         if (!empty($packages)) {
             $dispatcher = new EventDispatcher();
-            $this->io->writeError(sprintf("<info>UVDesk operations: evaluating %s packages</info>", count($packages)));
+            $this->io->writeError(sprintf("<info>UVDesk operations: %s packages</info>", count($packages)));
             
             foreach ($packages as $packageHandler) {
-                $dispatcher->addListener('uvdesk.composer.packageUpdated', [$packageHandler, 'onPackageUpdated']);
+                $dispatcher->addListener('uvdesk.composer.package.updated', [$packageHandler, 'handleComposerPackageUpdate']);
             }
 
-            $dispatcher->dispatch('uvdesk.composer.packageUpdated');
+            $dispatcher->dispatch('uvdesk.composer.package.updated');
         }
     }
 
@@ -103,14 +103,14 @@ class Manager implements PluginInterface, EventSubscriberInterface
     {
         $packages = $this->loadDependencies($this->packagesOperation);
 
-        if (!empty($packages['listeners'])) {
+        if (!empty($packages)) {
             $dispatcher = new EventDispatcher();
 
-            foreach ($packages['listeners'] as $packageHandler) {
-                $dispatcher->addListener('uvdesk.composer.projectCreated', [$packageHandler, 'onProjectCreated']);
+            foreach ($packages as $packageHandler) {
+                $dispatcher->addListener('uvdesk.composer.project.created', [$packageHandler, 'handleComposerProjectCreate']);
             }
 
-            $dispatcher->dispatch('uvdesk.composer.projectCreated');
+            $dispatcher->dispatch('uvdesk.composer.project.created');
         }
     }
     
