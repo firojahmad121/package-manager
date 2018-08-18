@@ -56,12 +56,7 @@ class Manager implements PluginInterface, EventSubscriberInterface
 
     public function loadDependencies(array $packageOperations = [])
     {
-        $dependencies = [
-            'count' => ['install' => 0, 'update' => 0, 'remove' => 0],
-            'listeners' => [],
-        ];
-
-        $this->io->writeError("\n<comment>Evaluating dependency configurations (uvdesk packages)</comment>");
+        $dependencies = [];
 
         foreach ($packageOperations as $packageOperation) {
             $package = $packageOperation instanceof UpdateOperation ? $packageOperation->getTargetPackage() : $packageOperation->getPackage();
@@ -72,11 +67,10 @@ class Manager implements PluginInterface, EventSubscriberInterface
                     $packageListener = new $extras['uvdesk-handler']($package, $packageOperation);
                     
                     if ($packageListener instanceof ComposerPackageListener) {
-                        $dependencies['listeners'][] = $packageListener;
-                        $dependencies['count'][$packageListener->getPackageOperationType()] += 1;
+                        $dependencies[] = $packageListener;
                     }
                 } catch (\Exception $e) {
-                    $this->io->writeError("\n<error>Failed to evaluate configs for package <error><comment>" . $package->getNames()[0] . "</comment>");
+                    continue;
                 }
             }
         }
@@ -93,11 +87,11 @@ class Manager implements PluginInterface, EventSubscriberInterface
     {
         $packages = $this->loadDependencies($this->packagesOperation);
 
-        if (!empty($packages['listeners'])) {
+        if (!empty($packages)) {
             $dispatcher = new EventDispatcher();
-            $this->io->writeError(sprintf("<info>Configuration operations: %s install, %s updates, %s removals</info>", $packages['count']['install'], $packages['count']['update'], $packages['count']['remove']));
-
-            foreach ($packages['listeners'] as $packageHandler) {
+            $this->io->writeError(sprintf("<info>UVDesk operations: evaluating %s packages</info>", count($packages)));
+            
+            foreach ($packages as $packageHandler) {
                 $dispatcher->addListener('uvdesk.composer.packageUpdated', [$packageHandler, 'onPackageUpdated']);
             }
 
@@ -111,7 +105,6 @@ class Manager implements PluginInterface, EventSubscriberInterface
 
         if (!empty($packages['listeners'])) {
             $dispatcher = new EventDispatcher();
-            $this->io->writeError(sprintf("<info>Configuration operations: %s install, %s updates, %s removals</info>", $packages['count']['install'], $packages['count']['update'], $packages['count']['remove']));
 
             foreach ($packages['listeners'] as $packageHandler) {
                 $dispatcher->addListener('uvdesk.composer.projectCreated', [$packageHandler, 'onProjectCreated']);
