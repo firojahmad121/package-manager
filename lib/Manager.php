@@ -64,11 +64,10 @@ class Manager implements PluginInterface, EventSubscriberInterface
             
             if (!empty($extras['uvdesk-package-extension']) && class_exists($extras['uvdesk-package-extension'])) {
                 try {
-                    var_dump($this->composer->getInstallationManager()->getInstallPath($package));
-                    die;
                     $packageListener = new $extras['uvdesk-package-extension']($package, $packageOperation);
                     
                     if ($packageListener instanceof ComposerPackageListener) {
+                        $packageListener->setPackageInstallationPath($this->composer->getInstallationManager()->getInstallPath($package));
                         $dependencies[] = $packageListener;
                     }
                 } catch (\Exception $e) {

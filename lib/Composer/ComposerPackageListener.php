@@ -13,6 +13,7 @@ abstract class ComposerPackageListener
 {
     private $package;
     private $operation;
+    private $installPath;
 
     abstract public function loadPackageConfiguration();
 
@@ -42,6 +43,18 @@ abstract class ComposerPackageListener
         return $this->operation instanceof UpdateOperation ? 'update' : ($this->operation instanceof UninstallOperation ? 'remove' : 'install');
     }
 
+    public final function setPackageInstallationPath($installationPath = null)
+    {
+        $this->installPath = $installationPath;
+
+        return $this;
+    }
+
+    public final function getPackageInstallationPath()
+    {
+        return $this->installPath;
+    }
+
     public final function handleComposerProjectCreate(Event $event)
     {
         $packageConfig = $this->loadPackageConfiguration();
@@ -52,10 +65,7 @@ abstract class ComposerPackageListener
     public final function handleComposerPackageUpdate(Event $event)
     {
         $packageConfig = $this->loadPackageConfiguration();
-        // var_dump($this->getPackage()::class);
-        var_dump($this->getPackage()->getTargetDir());
-        
-        die;
+        var_dump($this->getPackageInstallationPath());
 
         // $packageConfig->moveResources();
         // $packageConfig->autoConfigureExtension();
