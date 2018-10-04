@@ -32,9 +32,6 @@ class Manager implements PluginInterface, EventSubscriberInterface
 
         $this->io = $io;
         $this->composer = $composer;
-        // var_dump($this->composer->getInstallationManager());
-        var_dump($this->composer->getInstallationManager()->getInstallPath());
-        die;
     }
 
     public function logPackageEvent(PackageEvent $event)
@@ -67,6 +64,8 @@ class Manager implements PluginInterface, EventSubscriberInterface
             
             if (!empty($extras['uvdesk-package-extension']) && class_exists($extras['uvdesk-package-extension'])) {
                 try {
+                    var_dump($this->composer->getInstallationManager()->getInstallPath($package));
+                    die;
                     $packageListener = new $extras['uvdesk-package-extension']($package, $packageOperation);
                     
                     if ($packageListener instanceof ComposerPackageListener) {
