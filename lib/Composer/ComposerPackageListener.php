@@ -14,9 +14,7 @@ abstract class ComposerPackageListener
     private $package;
     private $operation;
 
-    abstract public function onProjectCreated(Event $event);
-    abstract public function onPackageUpdated(Event $event);
-    abstract public function onPackageRemoved(Event $event);
+    abstract public function loadPackageConfiguration();
 
     public final function __construct(PackageInterface $package, OperationInterface $operation)
     {
@@ -46,11 +44,21 @@ abstract class ComposerPackageListener
 
     public final function handleComposerProjectCreate(Event $event)
     {
+        $packageConfig = $this->loadPackageConfiguration();
+
         $this->onProjectCreated($event);
     }
 
     public final function handleComposerPackageUpdate(Event $event)
     {
+        $packageConfig = $this->loadPackageConfiguration();
+        dump($this->getPackage());
+        die;
+
+        // $packageConfig->moveResources();
+        // $packageConfig->autoConfigureExtension();
+        // $packageConfig->outputPackageInstallationMessage();
+
         $consoleOutput = new ConsoleOutput();
         $consoleOutput->write(sprintf("  - Configuring <info>%s</info>\n", $this->getPackageName()));
 

@@ -62,9 +62,9 @@ class Manager implements PluginInterface, EventSubscriberInterface
             $package = $packageOperation instanceof UpdateOperation ? $packageOperation->getTargetPackage() : $packageOperation->getPackage();
             $extras = $package->getExtra();
             
-            if (!empty($extras['uvdesk-handler']) && class_exists($extras['uvdesk-handler'])) {
+            if (!empty($extras['uvdesk-package-extension']) && class_exists($extras['uvdesk-package-extension'])) {
                 try {
-                    $packageListener = new $extras['uvdesk-handler']($package, $packageOperation);
+                    $packageListener = new $extras['uvdesk-package-extension']($package, $packageOperation);
                     
                     if ($packageListener instanceof ComposerPackageListener) {
                         $dependencies[] = $packageListener;
