@@ -52,7 +52,9 @@ abstract class ComposerPackageListener
     public final function handleComposerPackageUpdate(Event $event)
     {
         $packageConfig = $this->loadPackageConfiguration();
-        var_dump($this->getPackage());
+        // var_dump($this->getPackage()::class);
+        var_dump($this->getPackage()->getTargetDir());
+        
         die;
 
         // $packageConfig->moveResources();
