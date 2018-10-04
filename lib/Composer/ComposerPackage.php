@@ -10,16 +10,14 @@ final class ComposerPackage
 
     public function setExtension($extension = null)
     {
-        $this->extension = is_string($extension) ? $extension : null;
+        $this->extension = !empty($extension) && is_string($extension) ? $extension : null;
 
         return $this;
     }
 
     public function writeToConsole($packageText = null)
     {
-        if (is_string($output)) {
-            $this->consoleOutput = $packageText;
-        }
+        $this->consoleOutput = !empty($packageText) && is_string($packageText) ? $packageText : null;
 
         return $this;
     }
