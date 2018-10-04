@@ -32,6 +32,9 @@ class Manager implements PluginInterface, EventSubscriberInterface
 
         $this->io = $io;
         $this->composer = $composer;
+        var_dump($this->composer->getInstallationManager());
+        var_dump($this->composer->getInstallationManager()->getInstallPath());
+        die;
     }
 
     public function logPackageEvent(PackageEvent $event)
