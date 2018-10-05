@@ -34,7 +34,7 @@ final class ComposerPackage
         $projectDirectory = getcwd();
 
         foreach ($this->movableResources as $destination => $source) {
-            $resourceSourcePath = "$projectDirectory/$source";
+            $resourceSourcePath = "$installationPath/$source";
             $resourceDestinationPath = "$projectDirectory/$destination";
 
             echo "Resource: $resourceSourcePath\n";
