@@ -58,20 +58,17 @@ final class ComposerPackage
                     $extensionClassPath = get_class($this->extension);
                     $pathRegisteredExtensions = "$projectDirectory/config/extensions.php";
 
-                    if (!file_exists($pathRegisteredExtensions)) {
-                        file_put_contents($pathRegisteredExtensions, str_replace("{REGISTERED_EXTENSIONS}", "", Extensions\HelpdeskExtension::CONFIG_TEMPLATE));
-                    }
-
-                    $registeredExtensions = require $pathRegisteredExtensions;
+                    $registeredExtensions = file_exists($pathRegisteredExtensions) ? require $pathRegisteredExtensions : [];
 
                     if (!in_array($extensionClassPath, $registeredExtensions)) {
                         array_push($registeredExtensions, $extensionClassPath);
-
-                        // $replaceString = "";
-
-                        // {REGISTERED_EXTENSIONS}
-                        var_dump($registeredExtensions);
                     }
+
+                    $registeredExtensions = array_map(function($classPath) {
+                        return "\t$classPath::class,\n";
+                    }, $registeredExtensions);
+
+                    file_put_contents($pathRegisteredExtensions, str_replace("{REGISTERED_EXTENSIONS}", implode("", $registeredExtensions), Extensions\HelpdeskExtension::CONFIG_TEMPLATE));
                     break;
                 default:
                     break;
