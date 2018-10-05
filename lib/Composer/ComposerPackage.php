@@ -55,15 +55,15 @@ final class ComposerPackage
         if (!empty($this->extension)) {
             switch (true) {
                 case $this->extension instanceof Extensions\HelpdeskExtension:
-                    $pathToExtensions = "$projectDirectory/config/extensions.php";
+                    $pathRegisteredExtensions = "$projectDirectory/config/extensions.php";
 
                     if (!file_exists($pathRegisteredExtensions)) {
-                        file_put_contents($resourceDestinationPath, Extensions\HelpdeskExtension::CONFIG_TEMPLATE);
+                        file_put_contents($pathRegisteredExtensions, Extensions\HelpdeskExtension::CONFIG_TEMPLATE);
                     }
 
-                    $registeredExtensions = require $pathToExtensions;
+                    $registeredExtensions = require $pathRegisteredExtensions;
                     var_dump($registeredExtensions);
-                    
+
                     break;
                 default:
                     break;
