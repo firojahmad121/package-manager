@@ -37,24 +37,22 @@ final class ComposerPackage
             $resourceSourcePath = "$installationPath/$source";
             $resourceDestinationPath = "$projectDirectory/$destination";
 
-            echo "Resource: $resourceSourcePath\n";
-            var_dump(file_exists($resourceSourcePath));
+            // echo "Resource: $resourceSourcePath\n";
+            // var_dump(file_exists($resourceSourcePath));
 
-            echo "Destination: $resourceDestinationPath\n";
-            var_dump(file_exists($resourceDestinationPath));
+            // echo "Destination: $resourceDestinationPath\n";
+            // var_dump(file_exists($resourceDestinationPath));
 
             if (file_exists($resourceSourcePath) && !file_exists($resourceDestinationPath)) {
+                // Create directory if it doesn't exist
                 $destinationDirectory = substr($resourceDestinationPath, 0, strrpos($resourceDestinationPath, '/'));
-                // array_pop($destinationDirectory = explode('/', $resourceDestinationPath));
-                // $destinationDirectory = implode('/', $destinationDirectory);
 
-                echo "Directory: $destinationDirectory";
+                if (!is_dir($destinationDirectory)) {
+                    mkdir($destinationDirectory);
+                }
 
-                // if (!is_dir($destinationDirectory)) {
-                //     mkdir($destinationDirectory);
-                // }
-
-                // file_put_contents($resourceDestinationPath, file_get_contents($resourceSourcePath));
+                // Move the contents of the source file to destination file
+                file_put_contents($resourceDestinationPath, file_get_contents($resourceSourcePath));
             }
         }
     }
