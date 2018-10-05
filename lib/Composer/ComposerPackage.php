@@ -28,10 +28,22 @@ final class ComposerPackage
 
         return $this;
     }
-    
-    public function moveResources()
-    {
 
+    public function moveResources($installationPath)
+    {
+        $projectDirectory = getcwd();
+
+        foreach ($this->movableResources as $destination => $source) {
+            $resourceSourcePath = "$projectDirectory/$source";
+            $resourceDestinationPath = "$projectDirectory/$destination";
+
+            var_dump("Source: " . $resourceSourcePath);
+            var_dump("Destination: " . $resourceDestinationPath);
+
+            // if (!file_exists($resourceDestinationPath . "uvdesk.yaml")) {
+
+            // }
+        }
     }
 
     public function autoConfigureExtension()

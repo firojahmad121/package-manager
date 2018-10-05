@@ -13,7 +13,7 @@ use Composer\Package\PackageInterface;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Composer\DependencyResolver\Operation\UpdateOperation;
-use Webkul\UVDesk\PackageManager\Composer\ComposerPackageListener;
+use Webkul\UVDesk\PackageManager\Composer\ComposerPackageExtension;
 
 class Manager implements PluginInterface, EventSubscriberInterface
 {
@@ -64,11 +64,11 @@ class Manager implements PluginInterface, EventSubscriberInterface
             
             if (!empty($extras['uvdesk-package-extension']) && class_exists($extras['uvdesk-package-extension'])) {
                 try {
-                    $packageListener = new $extras['uvdesk-package-extension']($package, $packageOperation);
+                    $pathToPackage = $this->composer->getInstallationManager()->getInstallPath($package);
+                    $extensionPackage = new $extras['uvdesk-package-extension']($package, $packageOperation, $pathToPackage);
                     
-                    if ($packageListener instanceof ComposerPackageListener) {
-                        $packageListener->setPackageInstallationPath($this->composer->getInstallationManager()->getInstallPath($package));
-                        $dependencies[] = $packageListener;
+                    if ($extensionPackage instanceof ComposerPackageExtension) {
+                        array_push($dependencies, $extensionPackage);
                     }
                 } catch (\Exception $e) {
                     continue;
@@ -93,7 +93,7 @@ class Manager implements PluginInterface, EventSubscriberInterface
             $this->io->writeError(sprintf("<info>UVDesk operations: %s packages</info>", count($packages)));
             
             foreach ($packages as $packageHandler) {
-                $dispatcher->addListener('uvdesk.composer.package.updated', [$packageHandler, 'handleComposerPackageUpdate']);
+                $dispatcher->addListener('uvdesk.composer.package.updated', [$packageHandler, 'handleComposerPackageUpdateEvent']);
             }
 
             $dispatcher->dispatch('uvdesk.composer.package.updated');
@@ -109,7 +109,7 @@ class Manager implements PluginInterface, EventSubscriberInterface
             $dispatcher = new EventDispatcher();
 
             foreach ($packages as $packageHandler) {
-                $dispatcher->addListener('uvdesk.composer.project.created', [$packageHandler, 'handleComposerProjectCreate']);
+                $dispatcher->addListener('uvdesk.composer.project.created', [$packageHandler, 'handleComposerProjectCreateEvent']);
             }
 
             $dispatcher->dispatch('uvdesk.composer.project.created');

@@ -2,6 +2,7 @@
 
 namespace Webkul\UVDesk\PackageManager\Composer;
 
+use Symfony\Component\Yaml\Yaml;
 use Composer\Package\PackageInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -9,18 +10,20 @@ use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\DependencyResolver\Operation\OperationInterface;
 
-abstract class ComposerPackageListener
+abstract class ComposerPackageExtension
 {
     private $package;
     private $operation;
-    private $installPath;
+    private $installationPath;
 
-    abstract public function loadPackageConfiguration();
-
-    public final function __construct(PackageInterface $package, OperationInterface $operation)
+    public final function __construct(PackageInterface $package, OperationInterface $operation, $installationPath)
     {
         $this->package = $package;
         $this->operation = $operation;
+
+        if (is_string($installationPath)) {
+            $this->installationPath = $installationPath;
+        }
     }
 
     public final function getPackage()
@@ -43,37 +46,24 @@ abstract class ComposerPackageListener
         return $this->operation instanceof UpdateOperation ? 'update' : ($this->operation instanceof UninstallOperation ? 'remove' : 'install');
     }
 
-    public final function setPackageInstallationPath($installationPath = null)
-    {
-        $this->installPath = $installationPath;
-
-        return $this;
-    }
-
-    public final function getPackageInstallationPath()
-    {
-        return $this->installPath;
-    }
-
-    public final function handleComposerProjectCreate(Event $event)
+    public final function handleComposerProjectCreateEvent(Event $event)
     {
         $packageConfig = $this->loadPackageConfiguration();
 
         // $this->onProjectCreated($event);
     }
 
-    public final function handleComposerPackageUpdate(Event $event)
+    public final function handleComposerPackageUpdateEvent(Event $event)
     {
-        $packageConfig = $this->loadPackageConfiguration();
-        var_dump($this->getPackageInstallationPath());
-
-        // $packageConfig->moveResources();
-        // $packageConfig->autoConfigureExtension();
-        // $packageConfig->outputPackageInstallationMessage();
-
         $consoleOutput = new ConsoleOutput();
+        $packageConfig = $this->loadPackageConfiguration();
+
         $consoleOutput->write(sprintf("  - Configuring <info>%s</info>\n", $this->getPackageName()));
 
-        // $this->onPackageUpdated($event);
+        $packageConfig->moveResources($this->installationPath);
+        $packageConfig->autoConfigureExtension();
+        $packageConfig->outputPackageInstallationMessage();
     }
+
+    abstract public function loadPackageConfiguration();
 }
