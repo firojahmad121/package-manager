@@ -59,7 +59,7 @@ final class ComposerPackage
                     $pathRegisteredExtensions = "$projectDirectory/config/extensions.php";
 
                     if (!file_exists($pathRegisteredExtensions)) {
-                        file_put_contents($pathRegisteredExtensions, str_replace(Extensions\HelpdeskExtension::CONFIG_TEMPLATE, ""));
+                        file_put_contents($pathRegisteredExtensions, str_replace("{REGISTERED_EXTENSIONS}", "", Extensions\HelpdeskExtension::CONFIG_TEMPLATE));
                     }
 
                     $registeredExtensions = require $pathRegisteredExtensions;
