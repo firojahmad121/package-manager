@@ -44,14 +44,17 @@ final class ComposerPackage
             var_dump(file_exists($resourceDestinationPath));
 
             if (file_exists($resourceSourcePath) && !file_exists($resourceDestinationPath)) {
-                array_pop($destinationDirectory = explode('/', $resourceDestinationPath));
-                $destinationDirectory = implode('/', $destinationDirectory);
+                $destinationDirectory = substr($resourceDestinationPath, 0, strrpos($resourceDestinationPath, '/'));
+                // array_pop($destinationDirectory = explode('/', $resourceDestinationPath));
+                // $destinationDirectory = implode('/', $destinationDirectory);
 
-                if (!is_dir($destinationDirectory)) {
-                    mkdir($destinationDirectory);
-                }
+                echo "Directory: $destinationDirectory";
 
-                file_put_contents($resourceDestinationPath, file_get_contents($resourceSourcePath));
+                // if (!is_dir($destinationDirectory)) {
+                //     mkdir($destinationDirectory);
+                // }
+
+                // file_put_contents($resourceDestinationPath, file_get_contents($resourceSourcePath));
             }
         }
     }
