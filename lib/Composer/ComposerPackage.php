@@ -2,7 +2,7 @@
 
 namespace Webkul\UVDesk\PackageManager\Composer;
 
-use Webkul\UVDesk\PackageManager\Extensions\ExtensionInterface;
+use Webkul\UVDesk\PackageManager\Extensions;
 
 final class ComposerPackage
 {
@@ -10,7 +10,7 @@ final class ComposerPackage
     private $consoleText;
     private $movableResources = [];
 
-    public function __construct(ExtensionInterface $extension = null)
+    public function __construct(Extensions\ExtensionInterface $extension = null)
     {
         $this->extension = $extension;
     }
@@ -53,7 +53,21 @@ final class ComposerPackage
 
         // Register package as an extension
         if (!empty($this->extension)) {
-            echo get_class($this->extension) . "\n";
+            switch (true) {
+                case $this->extension instanceof Extensions\HelpdeskExtension:
+                    $pathToExtensions = "$projectDirectory/config/extensions.php";
+
+                    if (!file_exists($pathRegisteredExtensions)) {
+                        file_put_contents($resourceDestinationPath, Extensions\HelpdeskExtension::CONFIG_TEMPLATE);
+                    }
+
+                    $registeredExtensions = require $pathToExtensions;
+                    var_dump($registeredExtensions);
+                    
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
