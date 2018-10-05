@@ -55,15 +55,23 @@ final class ComposerPackage
         if (!empty($this->extension)) {
             switch (true) {
                 case $this->extension instanceof Extensions\HelpdeskExtension:
+                    $extensionClassPath = get_class($this->extension);
                     $pathRegisteredExtensions = "$projectDirectory/config/extensions.php";
 
                     if (!file_exists($pathRegisteredExtensions)) {
-                        file_put_contents($pathRegisteredExtensions, Extensions\HelpdeskExtension::CONFIG_TEMPLATE);
+                        file_put_contents($pathRegisteredExtensions, str_replace(Extensions\HelpdeskExtension::CONFIG_TEMPLATE, ""));
                     }
 
                     $registeredExtensions = require $pathRegisteredExtensions;
-                    var_dump($registeredExtensions);
 
+                    if (!in_array($extensionClassPath, $registeredExtensions)) {
+                        array_push($registeredExtensions, $extensionClassPath);
+
+                        // $replaceString = "";
+
+                        // {REGISTERED_EXTENSIONS}
+                        var_dump($registeredExtensions);
+                    }
                     break;
                 default:
                     break;

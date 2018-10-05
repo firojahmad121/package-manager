@@ -8,7 +8,7 @@ abstract class HelpdeskExtension implements ExtensionInterface
 <?php
 
 return [
-
+{REGISTERED_EXTENSIONS}
 ];
 
 EXTENSIONS;
