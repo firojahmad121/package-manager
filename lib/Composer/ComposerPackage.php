@@ -37,12 +37,16 @@ final class ComposerPackage
             $resourceSourcePath = "$projectDirectory/$source";
             $resourceDestinationPath = "$projectDirectory/$destination";
 
-            var_dump("Source: " . $resourceSourcePath);
-            var_dump("Destination: " . $resourceDestinationPath);
+            if (file_exists($resourceSourcePath) && !file_exists($resourceDestinationPath)) {
+                array_pop($destinationDirectory = explode('/', $resourceDestinationPath));
+                $destinationDirectory = implode('/', $destinationDirectory);
 
-            // if (!file_exists($resourceDestinationPath . "uvdesk.yaml")) {
+                if (!is_dir($destinationDirectory)) {
+                    mkdir($destinationDirectory);
+                }
 
-            // }
+                file_put_contents($resourceDestinationPath, file_get_contents($resourceSourcePath));
+            }
         }
     }
 
