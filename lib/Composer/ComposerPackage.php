@@ -37,6 +37,12 @@ final class ComposerPackage
             $resourceSourcePath = "$projectDirectory/$source";
             $resourceDestinationPath = "$projectDirectory/$destination";
 
+            echo "Resource: $resourceSourcePath\n";
+            var_dump(file_exists($resourceSourcePath));
+
+            echo "Destination: $resourceDestinationPath\n";
+            var_dump(file_exists($resourceDestinationPath));
+
             if (file_exists($resourceSourcePath) && !file_exists($resourceDestinationPath)) {
                 array_pop($destinationDirectory = explode('/', $resourceDestinationPath));
                 $destinationDirectory = implode('/', $destinationDirectory);
