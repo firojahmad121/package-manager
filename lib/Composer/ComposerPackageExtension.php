@@ -56,13 +56,10 @@ abstract class ComposerPackageExtension
     public final function handleComposerPackageUpdateEvent(Event $event)
     {
         $consoleOutput = new ConsoleOutput();
-        $packageConfig = $this->loadPackageConfiguration();
-
         $consoleOutput->write(sprintf("  - Configuring <info>%s</info>\n", $this->getPackageName()));
 
-        $packageConfig->moveResources($this->installationPath);
-        $packageConfig->autoConfigureExtension();
-        $packageConfig->outputPackageInstallationMessage();
+        $this->loadPackageConfiguration()->autoConfigureExtension($this->installationPath);
+        // $packageConfig->outputPackageInstallationMessage();
     }
 
     abstract public function loadPackageConfiguration();

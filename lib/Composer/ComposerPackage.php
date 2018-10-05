@@ -2,17 +2,17 @@
 
 namespace Webkul\UVDesk\PackageManager\Composer;
 
+use Webkul\UVDesk\PackageManager\Extensions\ExtensionInterface;
+
 final class ComposerPackage
 {
     private $extension;
     private $consoleText;
     private $movableResources = [];
 
-    public function setExtension($extension = null)
+    public function __construct(ExtensionInterface $extension = null)
     {
-        $this->extension = !empty($extension) && is_string($extension) ? $extension : null;
-
-        return $this;
+        $this->extension = $extension;
     }
 
     public function writeToConsole($packageText = null)
@@ -29,24 +29,19 @@ final class ComposerPackage
         return $this;
     }
 
-    public function moveResources($installationPath)
+    public function autoConfigureExtension($installationPath)
     {
         $projectDirectory = getcwd();
 
+        // Dump package resources
         foreach ($this->movableResources as $destination => $source) {
             $resourceSourcePath = "$installationPath/$source";
             $resourceDestinationPath = "$projectDirectory/$destination";
 
-            // echo "Resource: $resourceSourcePath\n";
-            // var_dump(file_exists($resourceSourcePath));
-
-            // echo "Destination: $resourceDestinationPath\n";
-            // var_dump(file_exists($resourceDestinationPath));
-
             if (file_exists($resourceSourcePath) && !file_exists($resourceDestinationPath)) {
                 // Create directory if it doesn't exist
                 $destinationDirectory = substr($resourceDestinationPath, 0, strrpos($resourceDestinationPath, '/'));
-
+                
                 if (!is_dir($destinationDirectory)) {
                     mkdir($destinationDirectory);
                 }
@@ -55,11 +50,11 @@ final class ComposerPackage
                 file_put_contents($resourceDestinationPath, file_get_contents($resourceSourcePath));
             }
         }
-    }
 
-    public function autoConfigureExtension()
-    {
-        
+        // Register package as an extension
+        if (!empty($this->extension)) {
+            echo get_class($this->extension) . "\n";
+        }
     }
 
     public function outputPackageInstallationMessage()
