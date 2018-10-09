@@ -3,6 +3,7 @@
 namespace Webkul\UVDesk\PackageManager\Composer;
 
 use Webkul\UVDesk\PackageManager\Extensions;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 final class ComposerPackage
 {
@@ -78,6 +79,7 @@ final class ComposerPackage
 
     public function outputPackageInstallationMessage()
     {
-        
+        $console = new ConsoleOutput();
+        $console->writeln($this->consoleOutput);
     }
 }

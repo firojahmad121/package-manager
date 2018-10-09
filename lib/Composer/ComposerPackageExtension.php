@@ -58,9 +58,9 @@ abstract class ComposerPackageExtension
         $consoleOutput = new ConsoleOutput();
         $consoleOutput->write(sprintf("  - Configuring <info>%s</info>\n", $this->getPackageName()));
 
-        $this->loadPackageConfiguration()->autoConfigureExtension($this->installationPath);
-        // $packageConfig->outputPackageInstallationMessage();
+        $this
+            ->loadPackageConfiguration()
+            ->autoConfigureExtension($this->installationPath)
+            ->outputPackageInstallationMessage();
     }
-
-    abstract public function loadPackageConfiguration();
 }
