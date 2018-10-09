@@ -59,7 +59,7 @@ abstract class ComposerPackageExtension
         $consoleOutput->write(sprintf("  - Configuring <info>%s</info>\n", $this->getPackageName()));
 
         $this
-            ->loadPackageConfiguration()
+            ->loadConfiguration()
             ->autoConfigureExtension($this->installationPath)
             ->outputPackageInstallationMessage();
     }
