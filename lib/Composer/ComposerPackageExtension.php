@@ -48,9 +48,10 @@ abstract class ComposerPackageExtension
 
     public final function handleComposerProjectCreateEvent(Event $event)
     {
-        $packageConfig = $this->loadPackageConfiguration();
-
-        // $this->onProjectCreated($event);
+        $this
+            ->loadConfiguration()
+            ->autoConfigureExtension($this->installationPath)
+            ->outputPackageInstallationMessage();
     }
 
     public final function handleComposerPackageUpdateEvent(Event $event)
@@ -60,7 +61,6 @@ abstract class ComposerPackageExtension
 
         $this
             ->loadConfiguration()
-            ->autoConfigureExtension($this->installationPath)
-            ->outputPackageInstallationMessage();
+            ->autoConfigureExtension($this->installationPath);
     }
 }

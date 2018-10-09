@@ -90,7 +90,7 @@ class Manager implements PluginInterface, EventSubscriberInterface
 
         if (!empty($packages)) {
             $dispatcher = new EventDispatcher();
-            $this->io->writeError(sprintf("<info>UVDesk operations: %s packages</info>", count($packages)));
+            $this->io->writeError(sprintf("\n<info>Package Manager: %s package operations</info>", count($packages)));
             
             foreach ($packages as $packageHandler) {
                 $dispatcher->addListener('uvdesk.composer.package.updated', [$packageHandler, 'handleComposerPackageUpdateEvent']);
