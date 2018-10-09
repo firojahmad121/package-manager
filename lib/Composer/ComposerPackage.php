@@ -75,6 +75,8 @@ final class ComposerPackage
                     break;
             }
         }
+
+        return $this;
     }
 
     public function outputPackageInstallationMessage()
