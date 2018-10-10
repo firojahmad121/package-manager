@@ -18,7 +18,7 @@ final class ComposerPackage
 
     public function writeToConsole($packageText = null)
     {
-        $this->consoleOutput = !empty($packageText) && is_string($packageText) ? $packageText : null;
+        $this->consoleText = !empty($packageText) && is_string($packageText) ? $packageText : null;
 
         return $this;
     }
@@ -82,6 +82,6 @@ final class ComposerPackage
     public function outputPackageInstallationMessage()
     {
         $console = new ConsoleOutput();
-        $console->writeln($this->consoleOutput);
+        $console->writeln($this->consoleText);
     }
 }
