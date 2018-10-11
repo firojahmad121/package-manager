@@ -18,41 +18,35 @@ final class ComposerPackage
         $this->extension = $extension;
     }
 
-    private function resolveArrayToLowestLevel($arr)
+    private function resolveToLowestDepth($array)
     {
-        if (is_array($arr)) {
-            if ($this->calculateArrayDepth($arr) > 1) {
-                foreach ($arr as $index => $element) {
-                    $arr[$index] = $this->resolveArrayToLowestLevel($element);
+        if (is_array($array)) {
+            if ($this->calculateArrayDepth($array) > 1) {
+                foreach ($array as $index => $element) {
+                    $array[$index] = (is_array($element) && $this->calculateArrayDepth($element) === 1) ? $element : $this->resolveToLowestDepth($element);
                 }
-
-                return array_unique($arr, SORT_REGULAR);
-            } else {
-                $arr = array_unique($arr, SORT_REGULAR);
-    
-                return $arr;
             }
+
+            return array_unique($array, SORT_REGULAR);
         }
 
-        return $arr;
+        return $array;
     }
 
     private function calculateArrayDepth(array $array)
     {
-        $max_indentation = 1;
-    
-        $array_str = print_r($array, true);
-        $lines = explode("\n", $array_str);
+        $indentationLimit = 1;
+        $lines = explode("\n", print_r($array, true));
     
         foreach ($lines as $line) {
             $indentation = (strlen($line) - strlen(ltrim($line))) / 4;
     
-            if ($indentation > $max_indentation) {
-                $max_indentation = $indentation;
+            if ($indentation > $indentationLimit) {
+                $indentationLimit = $indentation;
             }
         }
     
-        return (int) ceil(($max_indentation - 1) / 2) + 1;
+        return (int) ceil(($indentationLimit - 1) / 2) + 1;
     }
 
     public function writeToConsole($packageText = null)
@@ -106,7 +100,7 @@ final class ComposerPackage
                     $extensionConfig = Yaml::parseFile("$installationPath/$destinationPath");
 
                     $config = array_merge_recursive($config, $extensionConfig);
-                    $config = $this->resolveArrayToLowestLevel($config);
+                    $config = $this->resolveToLowestDepth($config);
 
                     file_put_contents("$projectDirectory/$sourcePath", Yaml::dump($config, 6));
                 }
