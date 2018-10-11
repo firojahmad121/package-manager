@@ -69,19 +69,21 @@ final class ComposerPackage
             if (!empty($extensionConfig['security'])) {
                 foreach ($extensionConfig['security'] as $type => $configuration) {
                     switch ($type) {
+                        case 'encoders':
+                        case 'providers':
+                        case 'access_control':
+                        case 'role_hierarchy':
+                            $config = !empty($securityConfig['security'][$type]) ? $securityConfig['security'][$type] : [];
+                            $config = array_unique(array_merge($config, $configuration), SORT_REGULAR);
+
+                            $securityConfig['security'][$type] = $config;
+                            break;
                         case 'firewalls':
                             foreach ($configuration as $firewall => $firewallConfig) {
-                                // Only append config if previsouly not existent
                                 if (empty($securityConfig['security']['firewalls'][$firewall])) {
                                     $securityConfig['security']['firewalls'][$firewall] = $firewallConfig;
                                 }
                             }
-                            break;
-                        case 'access_control':
-                            $access_control = !empty($securityConfig['security']['access_control']) ? $securityConfig['security']['access_control'] : [];
-                            $access_control = array_unique(array_merge($access_control, $configuration), SORT_REGULAR);
-
-                            $securityConfig['security']['access_control'] = $access_control;
                             break;
                         default:
                             break;
@@ -89,7 +91,7 @@ final class ComposerPackage
                 }
             }
             
-            file_put_contents("$projectDirectory/config/packages/security.yaml", Yaml::dump($securityConfig, 2));
+            file_put_contents("$projectDirectory/config/packages/security.yaml", Yaml::dump($securityConfig, 5));
         }
 
         // Register package as an extension
