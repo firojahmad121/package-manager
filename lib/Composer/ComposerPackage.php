@@ -30,7 +30,7 @@ final class ComposerPackage
             } else {
                 $arr = array_unique($arr, SORT_REGULAR);
     
-                return count($arr) > 1 ? $arr : array_pop($arr);
+                return $arr;
             }
         }
 
