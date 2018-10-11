@@ -123,13 +123,7 @@ final class ComposerPackage
                     $config = file_exists("$projectDirectory/$sourcePath") ? Yaml::parseFile("$projectDirectory/$sourcePath") : [];
                     $extensionConfig = Yaml::parseFile("$installationPath/$destinationPath");
 
-                    $config = array_merge_recursive($config, $extensionConfig);
-
-                    print_r($config);
-
-                    $config = $this->resolveToLowestDepth($config);
-
-                    print_r($config);
+                    $config = $this->resolveToLowestDepth(array_merge_recursive($config, $extensionConfig));
                     
                     file_put_contents("$projectDirectory/$sourcePath", Yaml::dump($config, 6));
                 }
