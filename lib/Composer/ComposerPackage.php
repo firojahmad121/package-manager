@@ -43,7 +43,7 @@ final class ComposerPackage
         return (int) ceil(($indentationLimit - 1) / 2) + 1;
     }
 
-    private function resolveToLowestDepth($array, $flag = false)
+    private function resolveToLowestDepth($array)
     {
         if (is_array($array)) {
             if ($this->calculateArrayDepth($array) > 1) {
@@ -54,11 +54,12 @@ final class ComposerPackage
                         $array[$index] = $this->resolveToLowestDepth($element);
                     }
                 }
+                
             }
-
+            
             if ($this->isArrayAssociative($array)) {
                 foreach ($array as $index => $element) {
-                    if (is_array($element) && $this->calculateArrayDepth($element) === 1 && count($element) === 1) {
+                    if (is_array($element) && count($element) === 1 && $this->calculateArrayDepth($element) === 1 && false === $this->isArrayAssociative($element)) {
                         $array[$index] = array_pop($element);
                     }
                 }
