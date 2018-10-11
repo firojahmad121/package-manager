@@ -115,8 +115,9 @@ final class ComposerPackage
                     $config = array_merge_recursive($config, $extensionConfig);
                     $config = $this->resolveToLowestDepth($config);
 
-                    var_dump($config);
-
+                    print_r($config);
+                    echo "\n" . Yaml::dump($config, 6);
+                    
                     file_put_contents("$projectDirectory/$sourcePath", Yaml::dump($config, 6));
                 }
             }
