@@ -90,7 +90,7 @@ final class ComposerPackage
 
                     // $config = array_intersect_key($config, array_unique(array_map('serialize', $config)));
 
-                    // file_put_contents("$projectDirectory/$sourcePath", Yaml::dump($config, 6));
+                    file_put_contents("$projectDirectory/$sourcePath", Yaml::dump($config, 6));
                 }
             }
         }
