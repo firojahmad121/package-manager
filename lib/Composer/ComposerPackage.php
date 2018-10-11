@@ -11,7 +11,7 @@ final class ComposerPackage
     private $extension;
     private $consoleText;
     private $movableResources = [];
-    private $securityUpdateConfig = [];
+    private $combineResources = [];
 
     public function __construct(Extensions\ExtensionInterface $extension = null)
     {
@@ -32,9 +32,9 @@ final class ComposerPackage
         return $this;
     }
 
-    public function updateSecurityConfig($source)
+    public function combineProjectConfig($destination, $source)
     {
-        $this->securityUpdateConfig = $source;
+        $this->combineResources[$destination] = $source;
 
         return $this;
     }
@@ -62,37 +62,49 @@ final class ComposerPackage
         }
 
         // Perform security updates
-        if (!empty($this->securityUpdateConfig) && file_exists("$installationPath/$this->securityUpdateConfig")) {
-            $securityConfig = Yaml::parseFile("$projectDirectory/config/packages/security.yaml");
-            $extensionConfig = Yaml::parseFile("$installationPath/Templates/security-configs.yaml");
+        if (!empty($this->combineResources)) {
+            foreach ($this->combineResources as $sourcePath => $destinationPath) {
+                if (file_exists("$installationPath/$destinationPath")) {
+                    $config = file_exists("$projectDirectory/$sourcePath") ? Yaml::parseFile("$projectDirectory/sourcePath") : [];
+                    $extensionConfig = Yaml::parseFile("$installationPath/$sourcePath");
 
-            if (!empty($extensionConfig['security'])) {
-                foreach ($extensionConfig['security'] as $type => $configuration) {
-                    switch ($type) {
-                        case 'encoders':
-                        case 'providers':
-                        case 'access_control':
-                        case 'role_hierarchy':
-                            $config = !empty($securityConfig['security'][$type]) ? $securityConfig['security'][$type] : [];
-                            $config = array_unique(array_merge($config, $configuration), SORT_REGULAR);
+                    $config = array_merge_recursive($config, $extensionConfig);
 
-                            $securityConfig['security'][$type] = $config;
-                            break;
-                        case 'firewalls':
-                            foreach ($configuration as $firewall => $firewallConfig) {
-                                if (empty($securityConfig['security']['firewalls'][$firewall])) {
-                                    $securityConfig['security']['firewalls'][$firewall] = $firewallConfig;
-                                }
-                            }
-                            break;
-                        default:
-                            break;
-                    }
+                    file_put_contents("$projectDirectory/$sourcePath", Yaml::dump($config, 6));
                 }
             }
-            
-            file_put_contents("$projectDirectory/config/packages/security.yaml", Yaml::dump($securityConfig, 5));
         }
+        // if (!empty($this->securityUpdateConfig) && file_exists("$installationPath/$this->securityUpdateConfig")) {
+        //     $securityConfig = Yaml::parseFile("$projectDirectory/config/packages/security.yaml");
+        //     $extensionConfig = Yaml::parseFile("$installationPath/Templates/security-configs.yaml");
+
+        //     if (!empty($extensionConfig['security'])) {
+        //         foreach ($extensionConfig['security'] as $type => $configuration) {
+        //             switch ($type) {
+        //                 case 'encoders':
+        //                 case 'providers':
+        //                 case 'access_control':
+        //                 case 'role_hierarchy':
+        //                     $config = !empty($securityConfig['security'][$type]) ? $securityConfig['security'][$type] : [];
+        //                     $config = array_merge_recursive($config, $configuration);
+
+        //                     $securityConfig['security'][$type] = $config;
+        //                     break;
+        //                 case 'firewalls':
+        //                     foreach ($configuration as $firewall => $firewallConfig) {
+        //                         if (empty($securityConfig['security']['firewalls'][$firewall])) {
+        //                             $securityConfig['security']['firewalls'][$firewall] = $firewallConfig;
+        //                         }
+        //                     }
+        //                     break;
+        //                 default:
+        //                     break;
+        //             }
+        //         }
+        //     }
+            
+        //     file_put_contents("$projectDirectory/config/packages/security.yaml", Yaml::dump($securityConfig, 5));
+        // }
 
         // Register package as an extension
         if (!empty($this->extension)) {
