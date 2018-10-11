@@ -21,7 +21,7 @@ final class ComposerPackage
     private function resolveArrayToLowestLevel($arr)
     {
         if (is_array($arr)) {
-            if ($this->calculateArrayDepth($arr) > 1) {
+            if ($this->calculateArrayDepth($arr) > 2) {
                 foreach ($arr as $index => $element) {
                     $arr[$index] = $this->resolveArrayToLowestLevel($element);
                 }
