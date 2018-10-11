@@ -62,7 +62,7 @@ final class ComposerPackage
         }
 
         // Perform security updates
-        if (!empty($this->securityUpdateConfig) && file_exists("$installationPath/$securityUpdateConfig")) {
+        if (!empty($this->securityUpdateConfig) && file_exists("$installationPath/$this->securityUpdateConfig")) {
             $securityConfig = Yaml::parseFile("$projectDirectory/config/packages/security.yaml");
             $extensionConfig = Yaml::parseFile("$installationPath/Templates/security-configs.yaml");
 
