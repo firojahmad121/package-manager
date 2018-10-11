@@ -62,16 +62,35 @@ final class ComposerPackage
         }
 
         // Perform security updates
-        if (!empty($this->securityUpdateConfig) && file_exists("$installationPath/$resourceSourcePath")) {
-            $securityConfig = Yaml::parseFile("$installationPath/$resourceSourcePath");
+        if (!empty($this->securityUpdateConfig) && file_exists("$installationPath/$securityUpdateConfig")) {
+            $securityConfig = Yaml::parseFile("$projectDirectory/config/packages/security.yaml");
+            $extensionConfig = Yaml::parseFile("$installationPath/Templates/security-configs.yaml");
 
-            dump($securityConfig);
-            die;
-            // $yaml = Yaml::dump($array);
+            if (!empty($extensionConfig['security'])) {
+                foreach ($extensionConfig['security'] as $type => $configuration) {
+                    switch ($type) {
+                        case 'firewalls':
+                            foreach ($configuration as $firewall => $firewallConfig) {
+                                // Only append config if previsouly not existent
+                                if (empty($securityConfig['security']['firewalls'][$firewall])) {
+                                    $securityConfig['security']['firewalls'][$firewall] = $firewallConfig;
+                                }
+                            }
+                            break;
+                        case 'access_control':
+                            $access_control = !empty($securityConfig['security']['access_control']) ? $securityConfig['security']['access_control'] : [];
+                            $access_control = array_unique(array_merge($access_control, $configuration), SORT_REGULAR);
+
+                            $securityConfig['security']['access_control'] = $access_control;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
             
-            // file_put_contents('/path/to/file.yaml', $yaml);
+            file_put_contents("$projectDirectory/config/packages/security.yaml", Yaml::dump($securityConfig));
         }
-        
 
         // Register package as an extension
         if (!empty($this->extension)) {
