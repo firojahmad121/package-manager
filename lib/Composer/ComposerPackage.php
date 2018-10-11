@@ -27,25 +27,6 @@ final class ComposerPackage
         return array_keys($array) !== range(0, count($array) - 1);
     }
 
-    private function resolveToLowestDepth($array)
-    {
-        if (is_array($array)) {
-            if ($this->calculateArrayDepth($array) > 1) {
-                foreach ($array as $index => $element) {
-                    if (is_array($element) && $this->calculateArrayDepth($element) === 1) {
-                        $array[$index] = $this->isArrayAssociative($element) ? $element : array_unique($element, SORT_REGULAR);
-                    } else {
-                        $array[$index] = $this->resolveToLowestDepth($element);
-                    }
-                }
-            }
-
-            return array_unique($array, SORT_REGULAR);
-        }
-
-        return $array;
-    }
-
     private function calculateArrayDepth(array $array)
     {
         $indentationLimit = 1;
@@ -60,6 +41,35 @@ final class ComposerPackage
         }
     
         return (int) ceil(($indentationLimit - 1) / 2) + 1;
+    }
+
+    private function resolveToLowestDepth($array, $flag = false)
+    {
+        if (is_array($array)) {
+            if ($this->calculateArrayDepth($array) > 1) {
+                foreach ($array as $index => $element) {
+                    if (is_array($element) && $this->calculateArrayDepth($element) === 1) {
+                        $array[$index] = $this->isArrayAssociative($element) ? $element : array_unique($element, SORT_REGULAR);
+                    } else {
+                        $array[$index] = $this->resolveToLowestDepth($element);
+                    }
+                }
+            }
+
+            if ($this->isArrayAssociative($array)) {
+                foreach ($array as $index => $element) {
+                    if (is_array($element) && $this->calculateArrayDepth($element) === 1 && count($element) === 1) {
+                        $array[$index] = array_pop($element);
+                    }
+                }
+
+                return $array;
+            }
+
+            return array_unique($array, SORT_REGULAR);
+        }
+
+        return $array;
     }
 
     public function writeToConsole($packageText = null)
@@ -119,43 +129,11 @@ final class ComposerPackage
                     $config = $this->resolveToLowestDepth($config);
 
                     print_r($config);
-                    // echo "\n" . Yaml::dump($config, 6);
                     
                     file_put_contents("$projectDirectory/$sourcePath", Yaml::dump($config, 6));
                 }
             }
         }
-        // if (!empty($this->securityUpdateConfig) && file_exists("$installationPath/$this->securityUpdateConfig")) {
-        //     $securityConfig = Yaml::parseFile("$projectDirectory/config/packages/security.yaml");
-        //     $extensionConfig = Yaml::parseFile("$installationPath/Templates/security-configs.yaml");
-
-        //     if (!empty($extensionConfig['security'])) {
-        //         foreach ($extensionConfig['security'] as $type => $configuration) {
-        //             switch ($type) {
-        //                 case 'encoders':
-        //                 case 'providers':
-        //                 case 'access_control':
-        //                 case 'role_hierarchy':
-        //                     $config = !empty($securityConfig['security'][$type]) ? $securityConfig['security'][$type] : [];
-        //                     $config = array_merge_recursive($config, $configuration);
-
-        //                     $securityConfig['security'][$type] = $config;
-        //                     break;
-        //                 case 'firewalls':
-        //                     foreach ($configuration as $firewall => $firewallConfig) {
-        //                         if (empty($securityConfig['security']['firewalls'][$firewall])) {
-        //                             $securityConfig['security']['firewalls'][$firewall] = $firewallConfig;
-        //                         }
-        //                     }
-        //                     break;
-        //                 default:
-        //                     break;
-        //             }
-        //         }
-        //     }
-            
-        //     file_put_contents("$projectDirectory/config/packages/security.yaml", Yaml::dump($securityConfig, 5));
-        // }
 
         // Register package as an extension
         if (!empty($this->extension)) {
