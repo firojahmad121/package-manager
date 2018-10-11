@@ -18,12 +18,25 @@ final class ComposerPackage
         $this->extension = $extension;
     }
 
+    private function isArrayAssociative(array $array)
+    {
+        if ([] === $array) {
+            return false;
+        }
+
+        return array_keys($array) !== range(0, count($array) - 1);
+    }
+
     private function resolveToLowestDepth($array)
     {
         if (is_array($array)) {
             if ($this->calculateArrayDepth($array) > 1) {
                 foreach ($array as $index => $element) {
-                    $array[$index] = (is_array($element) && $this->calculateArrayDepth($element) === 1) ? array_unique($element, SORT_REGULAR) : $this->resolveToLowestDepth($element);
+                    if (is_array($element) && $this->calculateArrayDepth($element) === 1) {
+                        $array[$index] = $this->isArrayAssociative($element) ? $element : array_unique($element, SORT_REGULAR);
+                    } else {
+                        $array[$index] = $this->resolveToLowestDepth($element);
+                    }
                 }
             }
 
