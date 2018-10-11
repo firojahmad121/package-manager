@@ -2,6 +2,7 @@
 
 namespace Webkul\UVDesk\PackageManager\Composer;
 
+use Symfony\Component\Yaml\Yaml;
 use Webkul\UVDesk\PackageManager\Extensions;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
@@ -10,6 +11,7 @@ final class ComposerPackage
     private $extension;
     private $consoleText;
     private $movableResources = [];
+    private $securityUpdateConfig = [];
 
     public function __construct(Extensions\ExtensionInterface $extension = null)
     {
@@ -26,6 +28,13 @@ final class ComposerPackage
     public function movePackageConfig($destination, $source)
     {
         $this->movableResources[$destination] = $source;
+
+        return $this;
+    }
+
+    public function updateSecurityConfig($source)
+    {
+        $this->securityUpdateConfig = $source;
 
         return $this;
     }
@@ -51,6 +60,18 @@ final class ComposerPackage
                 file_put_contents($resourceDestinationPath, file_get_contents($resourceSourcePath));
             }
         }
+
+        // Perform security updates
+        if (!empty($this->securityUpdateConfig) && file_exists("$installationPath/$resourceSourcePath")) {
+            $securityConfig = Yaml::parseFile("$installationPath/$resourceSourcePath");
+
+            dump($securityConfig);
+            die;
+            // $yaml = Yaml::dump($array);
+            
+            // file_put_contents('/path/to/file.yaml', $yaml);
+        }
+        
 
         // Register package as an extension
         if (!empty($this->extension)) {
