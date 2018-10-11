@@ -18,6 +18,25 @@ final class ComposerPackage
         $this->extension = $extension;
     }
 
+    private function resolveArrayToLowestLevel($arr)
+    {
+        if (is_array($arr)) {
+            if ($this->calculateArrayDepth($arr) > 1) {
+                foreach ($arr as $index => $element) {
+                    $arr[$index] = $this->resolveLowestLevelArray($element);
+                }
+
+                return array_unique($arr, SORT_REGULAR);
+            } else {
+                $arr = array_unique($arr, SORT_REGULAR);
+    
+                return count($arr) > 1 ? $arr : array_pop($arr);
+            }
+        }
+
+        return $arr;
+    }
+
     private function calculateArrayDepth(array $array)
     {
         $max_indentation = 1;
@@ -33,7 +52,7 @@ final class ComposerPackage
             }
         }
     
-        return ceil(($max_indentation - 1) / 2) + 1;
+        return (int) ceil(($max_indentation - 1) / 2) + 1;
     }
 
     public function writeToConsole($packageText = null)
@@ -87,8 +106,7 @@ final class ComposerPackage
                     $extensionConfig = Yaml::parseFile("$installationPath/$destinationPath");
 
                     $config = array_merge_recursive($config, $extensionConfig);
-
-                    // $config = array_intersect_key($config, array_unique(array_map('serialize', $config)));
+                    $config = $this->resolveArrayToLowestLevel($config);
 
                     file_put_contents("$projectDirectory/$sourcePath", Yaml::dump($config, 6));
                 }
