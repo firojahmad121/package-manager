@@ -23,7 +23,7 @@ final class ComposerPackage
         if (is_array($arr)) {
             if ($this->calculateArrayDepth($arr) > 1) {
                 foreach ($arr as $index => $element) {
-                    $arr[$index] = $this->resolveLowestLevelArray($element);
+                    $arr[$index] = $this->resolveArrayToLowestLevel($element);
                 }
 
                 return array_unique($arr, SORT_REGULAR);
