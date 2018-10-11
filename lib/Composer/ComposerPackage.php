@@ -89,7 +89,7 @@ final class ComposerPackage
                 }
             }
             
-            file_put_contents("$projectDirectory/config/packages/security.yaml", Yaml::dump($securityConfig));
+            file_put_contents("$projectDirectory/config/packages/security.yaml", Yaml::dump($securityConfig, 2));
         }
 
         // Register package as an extension
