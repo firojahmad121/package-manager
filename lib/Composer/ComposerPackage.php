@@ -18,6 +18,24 @@ final class ComposerPackage
         $this->extension = $extension;
     }
 
+    private function calculateArrayDepth(array $array)
+    {
+        $max_indentation = 1;
+    
+        $array_str = print_r($array, true);
+        $lines = explode("\n", $array_str);
+    
+        foreach ($lines as $line) {
+            $indentation = (strlen($line) - strlen(ltrim($line))) / 4;
+    
+            if ($indentation > $max_indentation) {
+                $max_indentation = $indentation;
+            }
+        }
+    
+        return ceil(($max_indentation - 1) / 2) + 1;
+    }
+
     public function writeToConsole($packageText = null)
     {
         $this->consoleText = !empty($packageText) && is_string($packageText) ? $packageText : null;
@@ -69,9 +87,10 @@ final class ComposerPackage
                     $extensionConfig = Yaml::parseFile("$installationPath/$destinationPath");
 
                     $config = array_merge_recursive($config, $extensionConfig);
-                    $config = array_intersect_key($config, array_unique(array_map('serialize', $config)));
 
-                    file_put_contents("$projectDirectory/$sourcePath", Yaml::dump($config, 6));
+                    // $config = array_intersect_key($config, array_unique(array_map('serialize', $config)));
+
+                    // file_put_contents("$projectDirectory/$sourcePath", Yaml::dump($config, 6));
                 }
             }
         }
