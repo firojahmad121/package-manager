@@ -65,8 +65,8 @@ final class ComposerPackage
         if (!empty($this->combineResources)) {
             foreach ($this->combineResources as $sourcePath => $destinationPath) {
                 if (file_exists("$installationPath/$destinationPath")) {
-                    $config = file_exists("$projectDirectory/$sourcePath") ? Yaml::parseFile("$projectDirectory/sourcePath") : [];
-                    $extensionConfig = Yaml::parseFile("$installationPath/$sourcePath");
+                    $config = file_exists("$projectDirectory/$sourcePath") ? Yaml::parseFile("$projectDirectory/$sourcePath") : [];
+                    $extensionConfig = Yaml::parseFile("$installationPath/$destinationPath");
 
                     $config = array_merge_recursive($config, $extensionConfig);
 
